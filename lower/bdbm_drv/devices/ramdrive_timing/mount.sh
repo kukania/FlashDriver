@@ -1,1 +1,0 @@
-sudo insmod risa_dev_ramdrive_timing.ko
