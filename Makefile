@@ -2,8 +2,8 @@ export CC=g++
 
 TARGET_INF=interface
 TARGET_LOWER=posix_memory
-TARGET_ALGO=DFTL# <-- this is target
-#TARGET_ALGO=Page_ftl # <--default FTL
+#TARGET_ALGO=DFTL# <-- this is target
+TARGET_ALGO=Page_ftl # <--default FTL
 TARGET_BM=partition
 JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 

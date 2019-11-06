@@ -36,7 +36,7 @@ uint32_t page_read(request *const req){
 	my_req->parents=req;//add the upper request
 	my_req->end_req=page_end_req;//this is callback function
 	my_req->params=(void*)params;//add your parameter structure 
-	my_req->type=DATAR;//DATAR means DATA reads
+	my_req->type=DATAR;//DATAR means DATA reads, this affect traffics results
 
 
 	/*you note that after read a PPA, the callback function called*/
@@ -49,7 +49,7 @@ uint32_t page_write(request *const req){
 	algo_req *my_req=(algo_req*)malloc(sizeof(algo_req));
 	my_req->parents=req;
 	my_req->end_req=page_end_req;
-	my_req->type=DATAW;//DATAW means DATA write
+	my_req->type=DATAW;//DATAW means DATA write, this affect traffics results
 	my_req->params=(void*)params;
 
 	memcpy(req->value->value,&req->key,sizeof(req->key));

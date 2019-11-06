@@ -282,7 +282,7 @@ void bench_print(){
 		_m=&_master->m[i];
 		bdata=&_master->datas[i];
 #ifdef CDF
-		bench_cdf_print(_m->m_num,_m->type,bdata);
+	//	bench_cdf_print(_m->m_num,_m->type,bdata);
 #endif
 		bench_type_cdf_print(bdata);
 		
@@ -290,7 +290,7 @@ void bench_print(){
 		printf("|            bench type:                   |\n");
 		printf("--------------------------------------------\n");
 #ifdef BENCH
-
+/*
 		printf("----algorithm----\n");
 		for(int j=0; j<10; j++){
 			printf("[%d~%d(usec)]: %ld\n",j*100,(j+1)*100,bdata->algo_mic_per_u100[j]);
@@ -317,7 +317,7 @@ void bench_print(){
 		avg_sec=total/1000000;
 		avg_usec=total%1000000;
 		printf("[avg_low]: %ld.%ld\n",avg_sec,avg_usec);
-		bench_li_print(&_master->li[i],_m);
+		bench_li_print(&_master->li[i],_m);*/
 #endif
 		printf("\n----summary----\n");
 		if(_m->type==RANDRW || _m->type==SEQRW){
