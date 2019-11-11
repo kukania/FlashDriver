@@ -94,7 +94,7 @@ FlashDriver$ make driver
 FlahsDriver$ ./driver
 ```
 
-##For DGIST students who attend Special Topic in Computer System
+## For DGIST students who attend Special Topic in Computer System
 You should implement lasts of the ```algorithm/DFTL``` for DFTL.
 There are some skeleton codes with comments.
 
