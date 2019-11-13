@@ -111,7 +111,7 @@ And Also you can modify the DRAM capacity by using ```./driver -d 'MAX_CACHINGPA
 To do this, you look carefully the function named demand_get_parameter in ```algortihm/DFTL/dftl.c```
 It is also the part of the requirments.
 
-If you want to run different workload, you can modify ```interface/mainfiles/default_main.c'''.
+If you want to run different workload, you can modify  ```interface/mainfiles/default_main.c```.
 <img src="./main.png"/>
 Above three bench_add functions mean that seqwrite, randwrite, rand read each.
 Commented three bench_add functions means that locality write, read, read write mixed workload each.
