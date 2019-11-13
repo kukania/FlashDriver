@@ -24,7 +24,6 @@ extern int32_t write_stop;
 master *_master;
 #ifndef KVSSD
 void latency(uint32_t,uint32_t,monitor*);
-
 void rand_latency(uint32_t start, uint32_t end,int percentage, monitor *m);
 void seq_latency(uint32_t start, uint32_t end,int percentage, monitor *m);
 #endif
@@ -46,9 +45,9 @@ static bool bitmap_get(uint32_t key){
 	return bitmap[block]&(1<<offset);
 }
 /*
-inline uint32_t GET_VALUE_SIZE{
-	((VALUESIZE==-1?(rand()%(NPCINPAGE)-1)+1:VALUESIZE)*PIECE);
-}*/
+   inline uint32_t GET_VALUE_SIZE{
+   ((VALUESIZE==-1?(rand()%(NPCINPAGE)-1)+1:VALUESIZE)*PIECE);
+   }*/
 void bench_init(){
 	OVERLAP=0.0;
 	_master=(master*)malloc(sizeof(master));
@@ -71,21 +70,21 @@ void bench_init(){
 		_master->m[i].empty=true;
 		_master->m[i].type=NOR;
 	}
-	
+
 	/*
-	for(int i=0;i<BENCHNUM;i++){
-		for(int j=0;j<ALGOTYPE;j++){
-			for(int k=0;k<LOWERTYPE;k++){
-				_master->datas[i].ftl_poll[j][k].min = UINT64_MAX;
-				//_master->datas[i].ftl_npoll[j][k].min = UINT64_MAX;
-			}
-		}
-	}
-	*/
-	//printf("bench:%ld\n",TOTALSIZE/PAGESIZE/8);
-	//bitmap=(uint8_t*)malloc(sizeof(uint8_t)*(TOTALSIZE/(PAGESIZE)/8));
-	bitmap=(uint8_t*)malloc(sizeof(uint8_t)*(TOTALSIZE/(PAGESIZE)/8)*NPCINPAGE);
-	_master->error_cnt=0;
+	   for(int i=0;i<BENCHNUM;i++){
+	   for(int j=0;j<ALGOTYPE;j++){
+	   for(int k=0;k<LOWERTYPE;k++){
+	   _master->datas[i].ftl_poll[j][k].min = UINT64_MAX;
+//_master->datas[i].ftl_npoll[j][k].min = UINT64_MAX;
+}
+}
+}
+	 */
+//printf("bench:%ld\n",TOTALSIZE/PAGESIZE/8);
+//bitmap=(uint8_t*)malloc(sizeof(uint8_t)*(TOTALSIZE/(PAGESIZE)/8));
+bitmap=(uint8_t*)malloc(sizeof(uint8_t)*(TOTALSIZE/(PAGESIZE)/8)*NPCINPAGE);
+_master->error_cnt=0;
 }
 void bench_make_data(){
 	int idx=_master->n_num;
@@ -144,6 +143,15 @@ void bench_make_data(){
 			rand_latency(start,end,50,_m);
 			break;
 #endif
+		case LOCWRITE:
+			loc_write(start,end,_m);
+			break;
+		case LOCREAD:
+			loc_read(start,end,_m);
+			break;
+		case LOCMIXED:
+			loc_mixed(start,end,_m);
+			break;
 		default:
 			printf("making data failed\n");
 			break;
@@ -200,11 +208,11 @@ bench_value* __get_bench(){
 	if(_m->n_num==_m->m_num){
 		while(!bench_is_finish_n(_master->n_num)){
 			write_stop = false;
-        }
+		}
 		printf("\rtesting...... [100%%] done!\n");
 		printf("\n");
-        //sleep(5);
-		
+		//sleep(5);
+
 		for(int i=0; i<BENCHSETSIZE; i++){
 			free(_m->body[i]);
 		}
@@ -228,14 +236,14 @@ bench_value* __get_bench(){
 #endif
 	}
 
-    if (_m->n_num == _m->m_num -1) {
-        last_ack = true;
-    }
-	
-	
+	if (_m->n_num == _m->m_num -1) {
+		last_ack = true;
+	}
+
+
 	bench_value *res=&_m->body[_m->n_num/_m->bech][_m->n_num%_m->bech];
 	if(_m->n_num%_m->bech==0 && _m->n_num/_m->bech>1){
-	//	printf("%d %p org:%p\n",_m->n_num/_m->bech-1,&_m->body[_m->n_num/_m->bech-1],_m->body);
+		//	printf("%d %p org:%p\n",_m->n_num/_m->bech-1,&_m->body[_m->n_num/_m->bech-1],_m->body);
 		free(_m->body[_m->n_num/_m->bech-1]);
 		_m->body[_m->n_num/_m->bech-1]=NULL;
 	}
@@ -261,7 +269,7 @@ bool bench_is_finish_n(volatile int n){
 		return true;
 	}
 	if(n+1==_master->m_num){
-	//	force_write_start=true;	
+		//	force_write_start=true;	
 		write_stop=0;
 	}
 	return false;
@@ -282,42 +290,42 @@ void bench_print(){
 		_m=&_master->m[i];
 		bdata=&_master->datas[i];
 #ifdef CDF
-	//	bench_cdf_print(_m->m_num,_m->type,bdata);
+		//	bench_cdf_print(_m->m_num,_m->type,bdata);
 #endif
 		bench_type_cdf_print(bdata);
-		
+
 		printf("--------------------------------------------\n");
 		printf("|            bench type:                   |\n");
 		printf("--------------------------------------------\n");
 #ifdef BENCH
-/*
-		printf("----algorithm----\n");
-		for(int j=0; j<10; j++){
-			printf("[%d~%d(usec)]: %ld\n",j*100,(j+1)*100,bdata->algo_mic_per_u100[j]);
-		}
-		printf("[over_ms]: %ld\n",bdata->algo_mic_per_u100[10]);
-		printf("[over__s]: %ld\n",bdata->algo_mic_per_u100[11]);
+		/*
+		   printf("----algorithm----\n");
+		   for(int j=0; j<10; j++){
+		   printf("[%d~%d(usec)]: %ld\n",j*100,(j+1)*100,bdata->algo_mic_per_u100[j]);
+		   }
+		   printf("[over_ms]: %ld\n",bdata->algo_mic_per_u100[10]);
+		   printf("[over__s]: %ld\n",bdata->algo_mic_per_u100[11]);
 
 
-		printf("----lower----\n");
-		for(int j=0; j<10; j++){
-			printf("[%d~%d(usec)]: %ld\n",j*100,(j+1)*100,bdata->lower_mic_per_u100[j]);
-		}
-		printf("[over_ms]: %ld\n",bdata->lower_mic_per_u100[10]);
-		printf("[over__s]: %ld\n",bdata->lower_mic_per_u100[11]);
+		   printf("----lower----\n");
+		   for(int j=0; j<10; j++){
+		   printf("[%d~%d(usec)]: %ld\n",j*100,(j+1)*100,bdata->lower_mic_per_u100[j]);
+		   }
+		   printf("[over_ms]: %ld\n",bdata->lower_mic_per_u100[10]);
+		   printf("[over__s]: %ld\n",bdata->lower_mic_per_u100[11]);
 
-		printf("----average----\n");
-		uint64_t total=0,avg_sec=0, avg_usec=0;
-		total=(bdata->algo_sec*1000000+bdata->algo_usec)/_m->m_num;
-		avg_sec=total/1000000;
-		avg_usec=total%1000000;
-		printf("[avg_algo]: %ld.%ld\n",avg_sec,avg_usec);
+		   printf("----average----\n");
+		   uint64_t total=0,avg_sec=0, avg_usec=0;
+		   total=(bdata->algo_sec*1000000+bdata->algo_usec)/_m->m_num;
+		   avg_sec=total/1000000;
+		   avg_usec=total%1000000;
+		   printf("[avg_algo]: %ld.%ld\n",avg_sec,avg_usec);
 
-		total=(bdata->lower_sec*1000000+bdata->lower_usec)/_m->m_num;
-		avg_sec=total/1000000;
-		avg_usec=total%1000000;
-		printf("[avg_low]: %ld.%ld\n",avg_sec,avg_usec);
-		bench_li_print(&_master->li[i],_m);*/
+		   total=(bdata->lower_sec*1000000+bdata->lower_usec)/_m->m_num;
+		   avg_sec=total/1000000;
+		   avg_usec=total%1000000;
+		   printf("[avg_low]: %ld.%ld\n",avg_sec,avg_usec);
+		   bench_li_print(&_master->li[i],_m);*/
 #endif
 		printf("\n----summary----\n");
 		if(_m->type==RANDRW || _m->type==SEQRW){
@@ -424,15 +432,15 @@ void bench_cdf_print(uint64_t nor, uint8_t type, bench_data *_d){//number of req
 	uint64_t cumulate_number=0;
 	if(type>RANDSET)
 		nor/=2;
-/*	if((type>RANDSET || type%2==1) || type==NOR){
+	/*	if((type>RANDSET || type%2==1) || type==NOR){
 		printf("\n[cdf]write---\n");
 		for(int i=0; i<1000000/TIMESLOT+1; i++){
-			cumulate_number+=_d->write_cdf[i];
-			if(_d->write_cdf[i]==0) continue;
-			//printf("%d\t%ld\t%f\n",i * 10,_d->write_cdf[i],(float)cumulate_number/_d->write_cnt);
-			if(nor==cumulate_number)
-				break;
-		}	
+		cumulate_number+=_d->write_cdf[i];
+		if(_d->write_cdf[i]==0) continue;
+	//printf("%d\t%ld\t%f\n",i * 10,_d->write_cdf[i],(float)cumulate_number/_d->write_cnt);
+	if(nor==cumulate_number)
+	break;
+	}	
 	} */
 	static int cnt=0;
 	cumulate_number=0;
@@ -473,7 +481,7 @@ void bench_reap_data(request *const req,lower_info *li){
 	if(req->type==FS_GET_T || req->type==FS_NOTFOUND_T){
 		bench_update_typetime(_data, req->type_ftl, req->type_lower,req->latency_checker.micro_time);
 	}
-	
+
 	if(req->type==FS_NOTFOUND_T){
 		_master->error_cnt++;
 	}
@@ -487,7 +495,7 @@ void bench_reap_data(request *const req,lower_info *li){
 			_data->read_cdf[slot_num]++;
 		}
 		if(_m->r_num%1000000==0){
-		//	bench_cdf_print(_m->r_num,_m->type,_data);
+			//	bench_cdf_print(_m->r_num,_m->type,_data);
 		}
 	}
 	else if(req->type==FS_SET_T){
@@ -591,16 +599,16 @@ int my_itoa(uint32_t key, char **_target){
 	target[2]='e';
 	target[3]='r';
 	/*
-	for(int i=cnt-1+4; i>=4; i--){
-		target[i]=t_key%10+'0';
-		t_key/=10;
-	}
-	for(int i=cnt+4;i<result; i++){
-		target[i]='0';
-	}*/
-	
+	   for(int i=cnt-1+4; i>=4; i--){
+	   target[i]=t_key%10+'0';
+	   t_key/=10;
+	   }
+	   for(int i=cnt+4;i<result; i++){
+	   target[i]='0';
+	   }*/
 
-	
+
+
 	for(int i=4; i<result-cnt; i++){
 		target[i]='0';
 	}
@@ -613,25 +621,25 @@ int my_itoa(uint32_t key, char **_target){
 	return result;
 }
 /*
-int my_itoa(uint32_t key, char **_target){
-	int cnt=1;
-	int standard=10;
-	int t_key=key;
-	while(t_key/10){
-		cnt++;
-		t_key/=10;
-		standard*=10;
-	}
-	*_target=(char*)malloc(cnt+1);
-	char *target=*_target;
-	t_key=key;
-	for(int i=cnt-1; i>=0; i--){
-		target[i]=t_key%10+'0';
-		t_key/=10;
-	}
-	target[cnt]='\0';
-	return cnt;
-}*/
+   int my_itoa(uint32_t key, char **_target){
+   int cnt=1;
+   int standard=10;
+   int t_key=key;
+   while(t_key/10){
+   cnt++;
+   t_key/=10;
+   standard*=10;
+   }
+ *_target=(char*)malloc(cnt+1);
+ char *target=*_target;
+ t_key=key;
+ for(int i=cnt-1; i>=0; i--){
+ target[i]=t_key%10+'0';
+ t_key/=10;
+ }
+ target[cnt]='\0';
+ return cnt;
+ }*/
 
 int my_itoa_padding(uint32_t key, char **_target,int digit){
 	int cnt=1;
@@ -773,8 +781,8 @@ void randset(uint32_t start, uint32_t end, monitor *m){
 #endif
 
 #ifdef DVALUE
-//		m->body[i/m->bech][i%m->bech].length=(rand()%(NPCINPAGE-1)+1)*PIECE;
-//	m->body[i/m->bech][i%m->bech].length=0;
+		//		m->body[i/m->bech][i%m->bech].length=(rand()%(NPCINPAGE-1)+1)*PIECE;
+		//	m->body[i/m->bech][i%m->bech].length=0;
 		m->body[i/m->bech][i%m->bech].length=GET_VALUE_SIZE;
 #else	
 		m->body[i/m->bech][i%m->bech].length=PAGESIZE;
@@ -791,19 +799,19 @@ void randrw(uint32_t start, uint32_t end, monitor *m){
 #ifdef KVSSD
 		uint32_t t_k;
 		KEYT *t=&m->body[i/m->bech][i%m->bech].key;
-	#ifdef KEYGEN
+#ifdef KEYGEN
 		t_k=keygenerator(end);	
-	#else
+#else
 		t_k=start+rand()%(end-start);
-	#endif
+#endif
 		bitmap_set(t_k);
 		t->len=my_itoa(t_k,&t->key);
 #else
-	#ifdef KEYGEN
+#ifdef KEYGEN
 		m->body[i/m->bech][i%m->bech].key=keygenerator(end);
-	#else
+#else
 		m->body[i/m->bech][i%m->bech].key=start+rand()%(end-start);
-	#endif
+#endif
 		bitmap_set(m->body[i/m->bech][i%m->bech].key);
 #endif
 
@@ -814,8 +822,8 @@ void randrw(uint32_t start, uint32_t end, monitor *m){
 			abort();
 		}
 
-//		m->body[i/m->bech][i%m->bech].length=0;
-//		m->body[i/m->bech][i%m->bech].length=PAGESIZE-PIECE;
+		//		m->body[i/m->bech][i%m->bech].length=0;
+		//		m->body[i/m->bech][i%m->bech].length=PAGESIZE-PIECE;
 #else	
 		m->body[i/m->bech][i%m->bech].length=PAGESIZE;
 #endif
@@ -841,18 +849,18 @@ void mixed(uint32_t start, uint32_t end,int percentage, monitor *m){
 #ifdef KVSSD
 		uint32_t t_k;
 		KEYT *t=&m->body[i/m->bech][i%m->bech].key;
-	#ifdef KEYGEN
+#ifdef KEYGEN
 		t_k=keygenerator(end);	
-	#else
+#else
 		t_k=start+rand()%(end-start);
-	#endif
+#endif
 		t->len=my_itoa(t_k,&t->key);
 #else
-	#ifdef KEYGEN
+#ifdef KEYGEN
 		m->body[i/m->bech][i%m->bech].key=keygenerator(end);
-	#else
+#else
 		m->body[i/m->bech][i%m->bech].key=start+rand()%(end-start);
-	#endif
+#endif
 
 #endif
 
@@ -988,7 +996,7 @@ void fillrand(uint32_t start, uint32_t end, monitor *m){
 	for(uint32_t i=start; i<=end; i++ ){
 		unique_array[i]=i;
 	}
-	
+
 	uint32_t range=end-start+1;
 	for(uint32_t i=start; i<=end; i++){
 		int a=rand()%range;
@@ -1018,6 +1026,69 @@ void fillrand(uint32_t start, uint32_t end, monitor *m){
 		m->write_cnt++;
 	}
 	free(unique_array);
+}
+
+void loc_write(uint32_t start, uint32_t end,monitor *m){
+	printf("making loc write bench!\n");
+	for(uint32_t i=0; i<m->m_num; i++){
+		uint32_t target=rand()%10;
+		if(target<8){
+			target=rand()%((end-start)*2/10);
+		}
+		else{
+			target=rand()%((end-start-((end-start)*2/10)))+((end-start)*2/10);
+		}
+		m->body[i/m->bech][i%m->bech].key=target;
+
+		m->body[i/m->bech][i%m->bech].length=PAGESIZE;
+		m->body[i/m->bech][i%m->bech].type=FS_SET_T;
+		m->body[i/m->bech][i%m->bech].mark=m->mark;
+		m->write_cnt++;
+	}
+}
+
+void loc_read(uint32_t start, uint32_t end,monitor *m){
+	printf("making loc read bench!\n");
+	for(uint32_t i=0; i<m->m_num; i++){
+		uint32_t target=rand()%10;
+		if(target<8){
+			target=rand()%((end-start)*2/10);
+		}
+		else{
+			target=rand()%((end-start-((end-start)*2/10)))+((end-start)*2/10);
+		}
+		m->body[i/m->bech][i%m->bech].key=target;
+
+		m->body[i/m->bech][i%m->bech].length=PAGESIZE;
+		m->body[i/m->bech][i%m->bech].type=FS_GET_T;
+		m->body[i/m->bech][i%m->bech].mark=m->mark;
+		m->read_cnt++;
+	}
+}
+
+void loc_mixed(uint32_t start, uint32_t end,monitor *m){
+	printf("making loc mixed bench!\n");
+	for(uint32_t i=0; i<m->m_num; i++){
+		uint32_t target=rand()%10;
+		if(target<8){
+			target=rand()%((end-start)*2/10);
+		}
+		else{
+			target=rand()%((end-start-((end-start)*2/10)))+((end-start)*2/10)+1;
+		}
+		m->body[i/m->bech][i%m->bech].key=target;
+
+		m->body[i/m->bech][i%m->bech].length=PAGESIZE;
+		bool isread=rand()%2;
+		m->body[i/m->bech][i%m->bech].type=isread?FS_GET_T:FS_SET_T;
+		m->body[i/m->bech][i%m->bech].mark=m->mark;
+		if(isread){
+			m->read_cnt++;
+		}
+		else{
+			m->write_cnt++;	
+		}
+	}
 }
 
 void bench_cache_hit(int mark){
@@ -1088,7 +1159,7 @@ int bench_set_params(int argc, char **argv, char **temp_argv){
 		{"value-size",1,0,0},
 		{0,0,0,0}
 	};
-	
+
 	int temp_cnt=0;
 	for(int i=0; i<argc; i++){
 		if(strncmp(argv[i],"--locality",strlen("--locality"))==0) continue;
@@ -1112,7 +1183,7 @@ int bench_set_params(int argc, char **argv, char **temp_argv){
 							LOCALITY=atoi(optarg);
 							TARGETRATIO=(float)(100-LOCALITY)/100;
 							locality_setting=true;
-					}
+						}
 						break;
 					case 1:
 						if(optarg!=NULL){
