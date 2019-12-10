@@ -117,6 +117,35 @@ Above three bench_add functions mean that seqwrite, randwrite, rand read each.
 Commented three bench_add functions means that locality write, read, read write mixed workload each.
 
 
+### Making custom writable data structure
+In case of making DFTL, you need to write/read mapping data to/from target device 
+To do this, First, you get writable or readable data structure by using 'inf_get_valueset' function which is defined in ```interface/interface.c``` .
+This function returns device accessible data structure called 'value_set'.
+Detail of value_set is defined in ```include/container.h```
+After using the assigned value_set, you should deallocate the data structure by using 'inf_free_valueset'.
+
+```
+inf_get_valueset('DATA_PTR','TYPE_OF_VALUESET','DATA_SIZE');
+/*
+	DATA_PTR: 
+		The source of data which you want to insert to device, this is available only the TYPE_OF_REQ is write type.
+		If you don't want or have any source, you can put it as NULL value. 
+		When you want to get value_set for reading data, you havt to set DATA_PTR to NULL.
+	TYPE_OF_REQ: 
+		If you want to get write_type -> FS_SET_T
+		If you want to get read_type -> FS_GET_T
+	DATA_SIZE:
+		It must be 8192 which is same as PAGESIZE defined in settings.h
+   */
+inf_free_valueset('PTR_of_valueset', 'TYPE_OF_VALUSET');
+/*
+	PTR_of_valueset:
+		This is tye ptr of value_set which you want to deallocate.
+	TYPE_OF_VALUESET:
+		It is type of target value_set
+   */
+```
+
 ## Help
 Contact to ```junsu_im@dgist.ac.kr``` or ```jinwook.bae@dgist.ac.kr```  
 README would be updated someday
