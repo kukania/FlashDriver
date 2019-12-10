@@ -118,10 +118,14 @@ Commented three bench_add functions means that locality write, read, read write 
 
 
 ### Making custom writable data structure
-In case of making DFTL, you need to write/read mapping data to/from target device 
+In case of making DFTL, you need to write/read mapping data to/from target device.
+
 To do this, First, you get writable or readable data structure by using 'inf_get_valueset' function which is defined in ```interface/interface.c``` .
+
 This function returns device accessible data structure called 'value_set'.
+
 Detail of value_set is defined in ```include/container.h```
+
 After using the assigned value_set, you should deallocate the data structure by using 'inf_free_valueset'.
 
 ```
