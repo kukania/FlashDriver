@@ -87,6 +87,11 @@ bench_value *bench_make_ondemand(){
 				res->length=GET_VALUE_SIZE;
 				t_k=start+(_m->n_num%(end-start));
 				break;
+		case SEQGET:
+				res->type=FS_GET_T;
+				res->length=GET_VALUE_SIZE;
+				t_k=start+(_m->n_num%(end-start));
+				break;
 		case RANDSET:
 				res->type=FS_SET_T;
 				res->length=GET_VALUE_SIZE;

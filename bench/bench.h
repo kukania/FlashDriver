@@ -128,10 +128,6 @@ void fillrand(uint32_t,uint32_t,monitor*);
 void randset(uint32_t,uint32_t,monitor*);
 void randrw(uint32_t,uint32_t,monitor*);
 void mixed(uint32_t,uint32_t,int percentage,monitor*);
-
-void loc_write(uint32_t,uint32_t,monitor*);
-void loc_read(uint32_t,uint32_t,monitor*);
-void loc_mixed(uint32_t,uint32_t,monitor*);
 int my_itoa(uint32_t key, char **_target);
 
 
